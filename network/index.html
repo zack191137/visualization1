@@ -1,8 +1,51 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<style>
+<html>
 
-.node {
+<head>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+	<script src="colorbrewer.js"></script>
+	
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+	<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+	<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+	
+	<style>
+		html,
+		body {
+			width: 100%;
+			height: 100%;
+			padding: 0;
+			margin: 0;
+		}
+		#map {
+			width: 100%;
+			height: 100%;
+			background: black;
+		}
+	
+		#menu {
+			position: absolute;
+			top: 5px;
+			left: 10px;
+			width: 200px;
+			height: 60px;
+			background: transparent;
+			z-index: 10;
+		}
+		#checkmenu {
+			position: absolute;
+			top: 5px;
+			left: 300px;
+			width: 300px;
+			height: 60px;
+			background: transparent;
+			z-index: 10;
+			
+		}
+		#checkbox{
+			float: left;
+		}
+		.node {
   stroke: #fff;
   stroke-width: 1.5px;
 }
@@ -15,79 +58,46 @@ stroke-width:5;
 .node.fixed {
   fill: #f00;
 }
+label,text {
+  pointer-events: none;
+  font-family:"Trebuchet MS";
+  
+}
+	</style>
+	<script type="text/javascript" src="new.js">
+			</script>
+	
+</head>
 
-</style>
 <body>
-<script src="http://d3js.org/d3.v3.min.js"></script><script src="colorbrewer.js"></script>
-<script>
 
+<div id="network">
+	<div id='menu'>
+		<p>
+			<label for="amount">Level range:</label>
+			<input type="text" id="amount" style="border:0; color:#f6931f; font-weight:bold;">
+		</p>
+		<div id="slider-range"></div>
+		
 
-var width = 960,
-    height = 960;
-    
-var a=[1,1,1,2,2,2,3,3,7,9];  
+	</div>
+	<div id='checkmenu'>
+	<input type="checkbox" name="chk_group[]" value="1" />Value 1<br />
+		<p>
+		<input type="checkbox" name="chk_group[]" value="2" />Value 2<br />
+		<input type="checkbox" name="chk_group[]" value="3" />Value 3<br />
+		<input type="checkbox" name="chk_group[]" value="4" />Value 1<br />
+		</p>
+		<p>
+		<input type="checkbox" name="chk_group[]" value="5" />Value 2<br />
+		<input type="checkbox" name="chk_group[]" value="6" />Value 3<br />
+		<input type="checkbox" name="chk_group[]" value="7" />Value 1<br />
+		<input type="checkbox" name="chk_group[]" value="8" />Value 2<br />
+		<input type="checkbox" name="chk_group[]" value="9" />Value 3<br />
+		</p>
+</div>
+</div>
 
-var z = d3.scale.ordinal()
-    .domain([1,2,3,4,5,6,7,8,9])
-    .range(colorbrewer.Blues[9]);  
+</body>
 
-var color = d3.scale.category20();
-
-var force = d3.layout.force()
-	    .charge(-120)
-    .linkDistance(400)
-    .size([width, height]);
-    
-    var drag = force.drag()
-    .on("dragstart", dragstart);
-
-var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height);
-    
-    
-d3.json("r.php", function(error, graph) {
-  force
-      .nodes(graph.nodes)
-      .links(graph.links)
-      .start();
-
-  var link = svg.selectAll(".link")
-      .data(graph.links)
-	  .enter().append("line")
-	  .filter(function(d) { return (d.value*10) >1})
-      .attr("class", "link")
-	  .style("stroke", function(d) { return z(d3.quantile(a,d.value)); }); 
-
-  var node = svg.selectAll(".node")
-      .data(graph.nodes)
-	  .enter().append("circle")
-	  .attr("class", "node")
-      .attr("r", 10)
-      .style("fill", function(d) { return color(d.group); })
-      .call(force.drag)
-      .on("dblclick", dblclick);
-    
-      
-	  node.append("title")
-      .text(function(d) { return d.name; });
-
-  force.on("tick", function() {
-    link.attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
-
-    node.attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
-  });
-});
-function dblclick(d) {
-  d3.select(this).classed("fixed", d.fixed = false);
-}
-
-function dragstart(d) {
-  d3.select(this).classed("fixed", d.fixed = true);
-}
-
-</script>
+</html>
